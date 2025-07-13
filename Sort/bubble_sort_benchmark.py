@@ -1,6 +1,6 @@
 from utils.simp_benchmark import function_timer
-from .bubble_sort import bubble_sort
-from typing import List, NoReturn, TypeVar, Tuple
+from .bubble_sort import bubble_sort, memorized_bubble_sort
+from typing import List, NoReturn, TypeVar, Tuple, Callable
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -12,6 +12,7 @@ libertinus_font = fm.FontProperties(fname = font_path)
 plt.figure(figsize = (6, 6))
 
 T = TypeVar("T")
+Func = TypeVar("Func", bound = Callable[List[T], NoReturn])
 
 ONE_ROUND_TIMES = 100
 GEN_MINIMAL = 20
@@ -22,10 +23,21 @@ BENCH_STEP = 5
 FAST_COMPLEXITY_SCALE = 150
 
 @function_timer
-def single_benchmark(array : List[T]) :
-    bubble_sort(array)
+def single_benchmark(array : List[T], func : Func) :
+    func(array)
 
-if __name__ == "__main__" :
+def dynamic_benchmark(func : Func) -> NoReturn :
+    """
+    This is the benchmark function for bubble sort / memorized bubble sort.
+
+    Review:
+        + Because the constant coefficient of best-case complexity is
+            a tiny value (related to CPU cycle). If we draw worst and
+            best together, the lower bound of chart seems to be a 
+            constant complexity, so we set a y-scale (here set 150) for
+            max-case and average-case complexity.
+    """
+
     res : List[Tuple[float, float, float]] = []
     for size in range(BENCH_MINIMAL, BENCH_MAXIMAL, BENCH_STEP) :
         average_bench_res : List[float] = []
@@ -35,7 +47,7 @@ if __name__ == "__main__" :
                 GEN_MAXIMAL,
                 size = size
             ).tolist()
-            average_bench_res.append(single_benchmark(arr))
+            average_bench_res.append(single_benchmark(arr, func))
 
         best_bench_res : List[float] = []
         for i in range(0, ONE_ROUND_TIMES) :
@@ -44,7 +56,7 @@ if __name__ == "__main__" :
                 GEN_MAXIMAL,
                 size = size
             ).tolist())
-            best_bench_res.append(single_benchmark(arr))
+            best_bench_res.append(single_benchmark(arr, func))
 
         worst_bench_res : List[float] = []
         for i in range(0, ONE_ROUND_TIMES) :
@@ -53,7 +65,7 @@ if __name__ == "__main__" :
                 GEN_MAXIMAL,
                 size = size
             ).tolist(), reverse = True)
-            worst_bench_res.append(single_benchmark(arr))
+            worst_bench_res.append(single_benchmark(arr, func))
 
         res.append((
             float(np.average(best_bench_res)),
@@ -95,4 +107,8 @@ if __name__ == "__main__" :
         fontproperties = libertinus_font,
         fontsize = 12
     )
+
+if __name__ == "__main__" :
+    dynamic_benchmark(bubble_sort)
+    dynamic_benchmark(memorized_bubble_sort)
     plt.savefig("Bubble-Sort-Benchmark.svg", format = "svg")
