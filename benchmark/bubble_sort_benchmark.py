@@ -1,19 +1,22 @@
-from utils.simp_benchmark import (
+from .utils.simp_benchmark import (
     function_timer, 
     function_memory_monitor
 )
-from .bubble_sort import (
+from algorithm.sort.bubble_sort import (
     bubble_sort, 
     memorized_bubble_sort
 )
 from typing import (
     List, 
-    NoReturn, 
     TypeVar, 
     Tuple, 
     Callable
 )
-from utils.color import CatppuccinCoolColor, CatppuccinWarmColor
+from .utils.color import (
+    EverForestBackgroundColor,
+    EverForestWarmColor,
+    EverForestCoolColor
+)
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -22,8 +25,10 @@ import matplotlib.font_manager as fm
 font_path = "/usr/share/fonts/libertinus/LibertinusSerif-Regular.ttf"
 libertinus_font = fm.FontProperties(fname = font_path)
 
+plt.rcParams["figure.facecolor"] = EverForestBackgroundColor
+plt.rcParams["axes.facecolor"] = EverForestBackgroundColor
+
 T = TypeVar("T")
-Func = TypeVar("Func", bound = Callable[List[T], NoReturn])
 
 ONE_ROUND_TIMES = 100
 GEN_MINIMAL = 20
@@ -34,23 +39,26 @@ BENCH_STEP = 5
 TIME_COMPLEXITY_SCALE = 150
 MEMO_COMPLEXITY_SCALE = 10000
 
-NORMAL_COLOR = CatppuccinWarmColor[
-    np.random.randint(0, len(CatppuccinWarmColor))
+NORMAL_COLOR = EverForestWarmColor[
+    np.random.randint(0, len(EverForestWarmColor))
 ]
-MEMORIZED_COLOR = CatppuccinCoolColor[
-    np.random.randint(0, len(CatppuccinCoolColor))
+MEMORIZED_COLOR = EverForestCoolColor[
+    np.random.randint(0, len(EverForestCoolColor))
 ]
 
 @function_timer
-def single_benchmark_time(array : List[T], func : Func) -> float :
+def single_benchmark_time(array : List[T], func : Callable[..., None]) -> None :
     func(array)
 
+# Notice, `single_benchmark_time` is an independent function and its return type
+# is determined by itself not the decorator function.
+
 def dynamic_benchmark_time(
-    func : Func, 
+    func : Callable[..., None], 
     color : str,
     fill_between_label : str,
     plot_label : str
-) -> NoReturn :
+) -> None :
     """
     This is the benchmark function for bubble sort / memorized bubble sort.
 
@@ -65,7 +73,7 @@ def dynamic_benchmark_time(
     res : List[Tuple[float, float, float]] = []
     for size in range(BENCH_MINIMAL, BENCH_MAXIMAL, BENCH_STEP) :
         average_bench_res : List[float] = []
-        for i in range(0, ONE_ROUND_TIMES) :
+        for _ in range(0, ONE_ROUND_TIMES) :
             arr = np.random.randint(
                 GEN_MINIMAL,
                 GEN_MAXIMAL,
@@ -74,7 +82,7 @@ def dynamic_benchmark_time(
             average_bench_res.append(single_benchmark_time(arr, func))
 
         best_bench_res : List[float] = []
-        for i in range(0, ONE_ROUND_TIMES) :
+        for _ in range(0, ONE_ROUND_TIMES) :
             arr = sorted(np.random.randint(
                 GEN_MINIMAL,
                 GEN_MAXIMAL,
@@ -83,7 +91,7 @@ def dynamic_benchmark_time(
             best_bench_res.append(single_benchmark_time(arr, func))
 
         worst_bench_res : List[float] = []
-        for i in range(0, ONE_ROUND_TIMES) :
+        for _ in range(0, ONE_ROUND_TIMES) :
             arr = sorted(np.random.randint(
                 GEN_MINIMAL,
                 GEN_MAXIMAL,
@@ -125,7 +133,7 @@ def dynamic_benchmark_time(
     plt.ylabel(
         "Algorithm Execution Time (× 150 μs)",
         fontproperties = libertinus_font,
-        fontsize = 14
+        fontsize = 15
     )
     plt.xticks(
         fontproperties = libertinus_font,
@@ -137,19 +145,19 @@ def dynamic_benchmark_time(
     )
 
 @function_memory_monitor(interval = 0.0001)
-def single_benchmark_memory(array : List[T], func : Func) -> int :
+def single_benchmark_memory(array : List[T], func : Callable[..., None]) -> None :
     func(array)
 
 def dynamic_benchmark_memory(
-    func : Func, 
+    func : Callable[..., None], 
     color : str,
     fill_between_label : str,
     plot_label : str
-) -> NoReturn :
+) -> None :
     res : List[Tuple[float, float, float]] = []
     for size in range(BENCH_MINIMAL, BENCH_MAXIMAL, BENCH_STEP) :
         average_bench_res : List[float] = []
-        for i in range(0, ONE_ROUND_TIMES) :
+        for _ in range(0, ONE_ROUND_TIMES) :
             arr = np.random.randint(
                 GEN_MINIMAL,
                 GEN_MAXIMAL,
