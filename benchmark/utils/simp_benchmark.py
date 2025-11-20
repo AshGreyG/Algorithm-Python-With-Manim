@@ -1,10 +1,8 @@
-from typing import Callable, TypeVar, Any, cast
-from time import perf_counter, sleep
+from typing import Callable, TypeVar, Any
+from time import perf_counter
 
-import os
 import functools
-import psutil
-import threading
+import tracemalloc
 
 T = TypeVar("T")
 
@@ -21,37 +19,14 @@ def function_timer(func : Callable[..., Any]) -> Callable[..., float] :
         return (end - start) * 1000 * 1000
     return wrapper
 
-def function_memory_monitor(interval : float = 0.01) :
-    def decorator(func : Callable[..., Any]) -> Callable[..., int] :
+def function_memory_monitor():
+    def decorator(func: Callable[..., Any]) -> Callable[..., int]:
         @functools.wraps(func)
-        def wrapper(*args : Any, **kwargs : Any) -> int :
-            # Get current thread
-            process = psutil.Process(os.getpid())
-
-            max_peak : int = process.memory_info().rss
-            start_memory : int = process.memory_info().rss
-
-            def monitor() -> None :
-                nonlocal max_peak
-                while not cast(bool, monitor.stop) : # type: ignore[attr-defined]
-                    current_memory = process.memory_info().rss
-                    if current_memory > max_peak :
-                        max_peak = current_memory
-
-                    sleep(interval)
-
-            monitor.stop = False # type: ignore[attr-defined]
-            thread = threading.Thread(target = monitor)
-            thread.start()
-
-            try :
-                _ = func(*args, **kwargs)
-            finally :
-                monitor.stop = True # type: ignore[attr-defined]
-                thread.join(timeout = 1)
-
-            peek_diff = max_peak - start_memory
-
-            return peek_diff
+        def wrapper(*args: Any, **kwargs: Any) -> int:
+            tracemalloc.start()
+            _ = func(*args, **kwargs)
+            _, peak = tracemalloc.get_traced_memory()
+            tracemalloc.stop()
+            return peak
         return wrapper
     return decorator

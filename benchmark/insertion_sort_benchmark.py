@@ -12,7 +12,6 @@ from typing import (
 from .utils.color import (
     EverForestBackgroundColor,
     EverForestWarmColor,
-    EverForestCoolColor
 )
 
 import numpy as np
@@ -38,9 +37,6 @@ MEMO_COMPLEXITY_SCALE = 10000
 
 NORMAL_COLOR = EverForestWarmColor[
     np.random.randint(0, len(EverForestWarmColor))
-]
-MEMORIZED_COLOR = EverForestCoolColor[
-    np.random.randint(0, len(EverForestCoolColor))
 ]
 
 @function_timer
@@ -128,7 +124,7 @@ def dynamic_benchmark_time(
         fontsize = 14
     )
     plt.ylabel(
-        "Algorithm Execution Time (× 150 μs)",
+        "Algorithm Execution Time (× 50 μs)",
         fontproperties = libertinus_font,
         fontsize = 15
     )
@@ -141,7 +137,7 @@ def dynamic_benchmark_time(
         fontsize = 12
     )
 
-@function_memory_monitor(interval = 0.0001)
+@function_memory_monitor()
 def single_benchmark_memory(array : List[T], func : Callable[..., None]) -> None :
     func(array)
 

@@ -144,7 +144,7 @@ def dynamic_benchmark_time(
         fontsize = 12
     )
 
-@function_memory_monitor(interval = 0.0001)
+@function_memory_monitor()
 def single_benchmark_memory(array : List[T], func : Callable[..., None]) -> None :
     func(array)
 
