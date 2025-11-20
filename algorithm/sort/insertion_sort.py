@@ -1,12 +1,6 @@
-from typing import TypeVar, List, Protocol, Self
+from typing import List
 
-class SupportsGreaterThan(Protocol) :
-    def __gt__(self, other : Self) -> bool :
-        ...
-
-T = TypeVar("T", bound = SupportsGreaterThan)
-
-def insertion_sort(array : List[T]) -> None :
+def insertion_sort(array : List[int]) -> None :
     i = 1
     while i < len(array) :
         j = i

@@ -1,12 +1,6 @@
-from typing import TypeVar, List, Protocol, Self
+from typing import List
 
-class SupportsGreaterThan(Protocol) :
-    def __gt__(self, other : Self) -> bool :
-        ...
-
-T = TypeVar("T", bound = SupportsGreaterThan)
-
-def bubble_sort(array : List[T]) -> None :
+def bubble_sort(array : List[int]) -> None :
     n = len(array)
     swapped = True
     while swapped :
@@ -16,7 +10,7 @@ def bubble_sort(array : List[T]) -> None :
                 array[i], array[i - 1] = array[i - 1], array[i]
                 swapped = True
 
-def memorized_bubble_sort(array : List[T]) -> None :
+def memorized_bubble_sort(array : List[int]) -> None :
     j = len(array)
     swapped = True
     while swapped :
