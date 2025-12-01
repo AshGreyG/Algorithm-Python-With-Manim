@@ -29,7 +29,7 @@ T = TypeVar("T")
 ONE_ROUND_TIMES = 100
 GEN_MINIMAL = 20
 GEN_MAXIMAL = 100
-BENCH_MINIMAL = 200
+BENCH_MINIMAL = 10
 BENCH_MAXIMAL = 1000
 BENCH_STEP = 5
 TIME_COMPLEXITY_SCALE = 10
@@ -99,7 +99,7 @@ def dynamic_benchmark_time(
         ))
 
     min_res = list(map(lambda x : x[0], res))
-    avr_res = list(map(lambda x : x[1] / TIME_COMPLEXITY_SCALE, res))
+    avr_res = list(map(lambda x : x[1] / (TIME_COMPLEXITY_SCALE / 2), res))
     max_res = list(map(lambda x : x[2] / TIME_COMPLEXITY_SCALE, res))
 
     plt.fill_between(
